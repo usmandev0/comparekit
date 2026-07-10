@@ -1,0 +1,17 @@
+*.iml
+.gradle
+.idea
+.DS_Store
+build
+captures
+.externalNativeBuild
+.cxx
+local.properties
+xcuserdata
+.kotlin
+#So we don't accidentally commit our private keys
+*.gpg
+gradle.properties
+
+# GitHub Actions require PAT with `workflow` scope to push; keep local until then
+.github/workflows/
