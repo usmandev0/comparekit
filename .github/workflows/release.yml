@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  version-changed:
+    name: Detect version change
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.compare.outputs.changed }}
+      version: ${{ steps.compare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compare library version
+        id: compare
+        run: |
+          VERSION_FILE="CompareKit/build.gradle.kts"
+
+          extract_version() {
+            sed -n 's/^[[:space:]]*version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' "$1" | head -1
+          }
+
+          CURRENT=$(extract_version "$VERSION_FILE")
+          echo "version=$CURRENT" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual run requested."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "Initial push detected."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PREVIOUS=$(git show "${{ github.event.before }}:$VERSION_FILE" 2>/dev/null | sed -n 's/^[[:space:]]*version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+
+          if [ "$PREVIOUS" != "$CURRENT" ]; then
+            echo "Version changed: $PREVIOUS -> $CURRENT"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Version unchanged ($CURRENT). Skipping build and publish."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    name: Build
+    needs: version-changed
+    if: needs.version-changed.outputs.changed == 'true'
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            tasks: ":CompareKit:compileAndroidMain"
+          - os: macos-latest
+            tasks: ":CompareKit:compileKotlinIosSimulatorArm64 :CompareKit:compileKotlinIosArm64"
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/*.lock', 'gradle/libs.versions.toml') }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: ${{ matrix.tasks }}
+
+  publish:
+    name: Publish
+    needs: [version-changed, build]
+    if: needs.version-changed.outputs.changed == 'true'
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 21
+      - name: Publish to MavenCentral
+        run: ./gradlew publishToMavenCentral --no-configuration-cache
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
