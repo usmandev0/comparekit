@@ -1,3 +1,4 @@
+import org.gradle.plugins.signing.SigningExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -51,6 +52,40 @@ kotlin {
 
         iosMain.dependencies {
             //put your multiplatform dependencies here
+        }
+    }
+}
+
+private fun String.normalizedSigningKeyId(): String {
+    val hex = trim()
+        .removePrefix("0x")
+        .removePrefix("0X")
+        .filter { it.isDigit() || it in 'A'..'F' || it in 'a'..'f' }
+
+    require(hex.isNotEmpty()) {
+        "signingInMemoryKeyId is empty. Set SIGNING_KEY_ID to the 8-character GPG key ID " +
+            "(run: gpg --list-secret-keys --keyid-format=short)."
+    }
+    require(hex.length == 8) {
+        "signingInMemoryKeyId must be exactly 8 hexadecimal characters, but got '$this'. " +
+            "Use the short key ID shown by: gpg --list-secret-keys --keyid-format=short"
+    }
+
+    return hex.uppercase()
+}
+
+plugins.withId("signing") {
+    extensions.configure<SigningExtension>("signing") {
+        val keyIdProperty = providers.gradleProperty("signingInMemoryKeyId")
+        val keyProperty = providers.gradleProperty("signingInMemoryKey")
+        val passwordProperty = providers.gradleProperty("signingInMemoryKeyPassword")
+
+        if (keyIdProperty.isPresent && keyProperty.isPresent) {
+            useInMemoryPgpKeys(
+                keyIdProperty.get().normalizedSigningKeyId(),
+                keyProperty.get().trim(),
+                passwordProperty.orNull?.trim().orEmpty(),
+            )
         }
     }
 }

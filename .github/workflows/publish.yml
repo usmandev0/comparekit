@@ -15,11 +15,27 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 21
+      - name: Validate signing secrets
+        env:
+          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+          GPG_KEY_CONTENTS: ${{ secrets.GPG_KEY_CONTENTS }}
+        run: |
+          KEY_ID="$(printf '%s' "$SIGNING_KEY_ID" | tr -d ' \n\r\t' | sed 's/^0x//I')"
+          if ! printf '%s' "$KEY_ID" | grep -Eq '^[0-9A-Fa-f]{8}$'; then
+            echo "::error::SIGNING_KEY_ID must be exactly 8 hex characters (short GPG key ID)."
+            echo "Run locally: gpg --list-secret-keys --keyid-format=short"
+            echo "Example value: AB12CD34"
+            exit 1
+          fi
+          if [ -z "$GPG_KEY_CONTENTS" ]; then
+            echo "::error::GPG_KEY_CONTENTS secret is empty."
+            exit 1
+          fi
+          echo "ORG_GRADLE_PROJECT_signingInMemoryKeyId=$KEY_ID" >> "$GITHUB_ENV"
       - name: Publish to MavenCentral
         run: ./gradlew publishToMavenCentral --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
