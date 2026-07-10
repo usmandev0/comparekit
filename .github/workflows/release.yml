@@ -105,18 +105,11 @@ jobs:
           SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
           GPG_KEY_CONTENTS: ${{ secrets.GPG_KEY_CONTENTS }}
         run: |
-          KEY_ID="$(printf '%s' "$SIGNING_KEY_ID" | tr -d ' \n\r\t' | sed 's/^0x//I')"
-          if ! printf '%s' "$KEY_ID" | grep -Eq '^[0-9A-Fa-f]{8}$'; then
-            echo "::error::SIGNING_KEY_ID must be exactly 8 hex characters (short GPG key ID)."
-            echo "Run locally: gpg --list-secret-keys --keyid-format=short"
-            echo "Example value: AB12CD34"
-            exit 1
-          fi
           if [ -z "$GPG_KEY_CONTENTS" ]; then
             echo "::error::GPG_KEY_CONTENTS secret is empty."
             exit 1
           fi
-          echo "ORG_GRADLE_PROJECT_signingInMemoryKeyId=$KEY_ID" >> "$GITHUB_ENV"
+          bash .github/scripts/normalize-signing-key-id.sh
       - name: Publish to MavenCentral
         run: ./gradlew publishToMavenCentral --no-configuration-cache
         env:

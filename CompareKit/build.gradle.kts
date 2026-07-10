@@ -63,15 +63,21 @@ private fun String.normalizedSigningKeyId(): String {
         .filter { it.isDigit() || it in 'A'..'F' || it in 'a'..'f' }
 
     require(hex.isNotEmpty()) {
-        "signingInMemoryKeyId is empty. Set SIGNING_KEY_ID to the 8-character GPG key ID " +
-            "(run: gpg --list-secret-keys --keyid-format=short)."
-    }
-    require(hex.length == 8) {
-        "signingInMemoryKeyId must be exactly 8 hexadecimal characters, but got '$this'. " +
-            "Use the short key ID shown by: gpg --list-secret-keys --keyid-format=short"
+        "signingInMemoryKeyId is empty. Set SIGNING_KEY_ID to your GPG key ID " +
+            "(run: gpg --list-secret-keys --keyid-format=long)."
     }
 
-    return hex.uppercase()
+    val shortKeyId = when (hex.length) {
+        8 -> hex
+        16, 40 -> hex.takeLast(8)
+        else -> error(
+            "signingInMemoryKeyId must be 8, 16, or 40 hexadecimal characters, but got " +
+                "'$this' (${hex.length} hex chars after cleanup). " +
+                "Run: gpg --list-secret-keys --keyid-format=long",
+        )
+    }
+
+    return shortKeyId.uppercase()
 }
 
 plugins.withId("signing") {
