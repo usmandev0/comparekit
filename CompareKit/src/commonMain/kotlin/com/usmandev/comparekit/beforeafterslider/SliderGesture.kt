@@ -1,4 +1,4 @@
-package com.usmandev.comparekit
+package com.usmandev.comparekit.beforeafterslider
 
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.ui.Modifier

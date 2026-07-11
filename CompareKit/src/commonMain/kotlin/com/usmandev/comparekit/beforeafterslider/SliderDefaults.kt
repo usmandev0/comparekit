@@ -1,4 +1,4 @@
-package com.usmandev.comparekit
+package com.usmandev.comparekit.beforeafterslider
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp

@@ -1,4 +1,4 @@
-package com.usmandev.comparekit
+package com.usmandev.comparekit.beforeafterslider
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size

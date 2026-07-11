@@ -1,4 +1,4 @@
-package com.usmandev.comparekit
+package com.usmandev.comparekit.beforeafterslider
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -24,9 +24,9 @@ import kotlin.math.roundToInt
 /**
  * A before/after image comparison slider built with Compose Multiplatform.
  *
- * The [before] image is drawn fully. The [after] image is clipped horizontally
- * according to [state] progress. A vertical divider and circular thumb follow
- * the drag position.
+ * The [before] image is clipped to the right of the divider and the [after]
+ * image is clipped to the left, so their backgrounds never overlap. A vertical
+ * divider and circular thumb follow the drag position.
  *
  * @param before painter for the fully visible "before" image.
  * @param after painter for the "after" image, clipped by slider progress.
@@ -37,8 +37,9 @@ import kotlin.math.roundToInt
 fun BeforeAfterSlider(
     before: Painter,
     after: Painter,
+    contentScale: ContentScale = ContentScale.Crop,
     modifier: Modifier = Modifier,
-    state: SliderState = rememberSliderState(),
+    state: SliderState = rememberCompareSliderState(),
 ) {
     var layoutSize by remember { mutableStateOf(IntSize.Zero) }
     val density = LocalDensity.current
@@ -56,22 +57,34 @@ fun BeforeAfterSlider(
         Image(
             painter = before,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
+            contentScale = contentScale,
+            modifier = Modifier
+                .fillMaxSize()
+                .drawWithContent {
+                    val clipStart = size.width * state.progress
+                    clipRect(
+                        left = clipStart,
+                        top = 0f,
+                        right = size.width,
+                        bottom = size.height,
+                    ) {
+                        this@drawWithContent.drawContent()
+                    }
+                },
         )
 
         Image(
             painter = after,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            contentScale = contentScale,
             modifier = Modifier
                 .fillMaxSize()
                 .drawWithContent {
-                    val clipWidth = size.width * state.progress
+                    val clipEnd = size.width * state.progress
                     clipRect(
                         left = 0f,
                         top = 0f,
-                        right = clipWidth,
+                        right = clipEnd,
                         bottom = size.height,
                     ) {
                         this@drawWithContent.drawContent()
