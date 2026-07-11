@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "io.github.usmandev0"
-version = "0.1.0-alpha01"
+version = "0.1.1"
 
 kotlin {
     android {
@@ -44,6 +44,7 @@ kotlin {
         commonMain.dependencies {
             api(libs.compose.runtime)
             api(libs.compose.foundation)
+            api(libs.compose.animation)
             api(libs.compose.ui)
         }
 
