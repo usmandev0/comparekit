@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.Dp
 @Composable
 internal fun SliderDivider(
     modifier: Modifier = Modifier,
-    thickness: Dp = SliderDefaults.DividerThickness,
-    color: Color = SliderDefaults.DividerColor,
+    thickness: Dp = CompareKitDefaults.DividerThickness,
+    color: Color = CompareKitDefaults.DividerColor,
 ) {
     Canvas(
         modifier = modifier
