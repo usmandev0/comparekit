@@ -10,11 +10,12 @@ plugins {
 }
 
 group = "io.github.usmandev0"
-version = "0.1.0"
+version = "0.1.0-alpha01"
 
 kotlin {
     android {
         namespace = "com.usmandev.comparekit"
+        //noinspection GradleDependency
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 

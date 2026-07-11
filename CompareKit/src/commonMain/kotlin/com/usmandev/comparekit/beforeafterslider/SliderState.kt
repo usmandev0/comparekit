@@ -1,4 +1,4 @@
-package com.usmandev.comparekit
+package com.usmandev.comparekit.beforeafterslider
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -53,7 +53,7 @@ class SliderState(
  * @param initialProgress the starting progress; defaults to 50%.
  */
 @Composable
-fun rememberSliderState(
+fun rememberCompareSliderState(
     initialProgress: Float = SliderState.DefaultProgress,
 ): SliderState {
     return remember {
