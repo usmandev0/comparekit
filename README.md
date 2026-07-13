@@ -1,38 +1,42 @@
+<p align="center">
+  <img src="images/comparekit-logo.png" alt="CompareKit logo" width="420" />
+</p>
 
+<p align="center">
+  <strong>Beautiful, interactive before/after image comparison for Kotlin Multiplatform.</strong>
+</p>
 
-# CompareKit
+<p align="center">
+  <a href="https://central.sonatype.com/artifact/io.github.usmandev0/comparekit">Maven Central</a> ·
+  <a href="https://kotlinlang.org">Kotlin</a> ·
+  <a href="https://www.jetbrains.com/compose-multiplatform/">Compose Multiplatform</a> ·
+  <a href="https://kotlinlang.org/docs/multiplatform.html">Platform</a> ·
+  <a href="LICENSE">License</a> ·
+  <a href="https://github.com/usmandev0/comparekit/stargazers">GitHub Stars</a>
+</p>
 
-**Beautiful, interactive before/after image comparison for Kotlin Multiplatform.**
+<p align="center">
+  <em>A modern Compose Multiplatform library for polished before/after image sliders.</em>
+</p>
 
-[Maven Central](https://central.sonatype.com/artifact/io.github.usmandev0/comparekit)
-[Kotlin](https://kotlinlang.org)
-[Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/)
-[Platform](https://kotlinlang.org/docs/multiplatform.html)
-[License](LICENSE)
-[GitHub Stars](https://github.com/usmandev0/comparekit/stargazers)
+<p align="center">
+  <a href="#installation"><strong>Installation</strong></a> ·
+  <a href="#usage"><strong>Quick Start</strong></a> ·
+  <a href="#usage"><strong>Documentation</strong></a> ·
+  <a href="#changelog"><strong>Changelog</strong></a> ·
+  <a href="#sample-app"><strong>Sample App</strong></a> ·
+  <a href="#contributing"><strong>Contributing</strong></a>
+</p>
 
-*A modern Compose Multiplatform library for polished before/after image sliders.*
+<p align="center">
+  <a href="README_SHORT.md">Short README</a> ·
+  <a href="CHANGELOG.md">Changelog file</a> ·
+  <a href="androidApp/README.md">Sample README</a>
+</p>
 
-  
+---
 
-
-
-
-
-
-  
-
-
-
-
-
-
-  
-
-
-**[Installation](#installation)** · **[Quick Start](#quick-start)** · **[Documentation](#usage)** · **[Sample App](#sample-app)** · **[Contributing](#contributing)**
-
-
+---
 
 ---
 
@@ -46,7 +50,7 @@
 | ✅   | **Android** — `minSdk 24+`                                              |
 | ✅   | **iOS** — `iosArm64`, `iosSimulatorArm64`                               |
 | ✅   | **Horizontal Slider** — smooth left/right before/after comparison       |
-| 🔜  | **Vertical Slider** — planned; horizontal is available today            |
+| ✅   | **Vertical Slider** — smooth top/bottom before/after comparison         |
 | ✅   | **Custom Thumb** — size, shape, color, and border                       |
 | ✅   | **Custom Divider** — color and thickness                                |
 | ✅   | **Labels** — default, custom composable, and alignment options          |
@@ -63,8 +67,6 @@
 
 ---
 
-
-
 ## Installation
 
 Add CompareKit to your **shared** `commonMain` source set.
@@ -75,7 +77,7 @@ Add CompareKit to your **shared** `commonMain` source set.
 # gradle/libs.versions.toml
 
 [versions]
-comparekit = "0.1.1"
+comparekit = "0.1.2"
 
 [libraries]
 comparekit = { module = "io.github.usmandev0:comparekit", version.ref = "comparekit" }
@@ -93,15 +95,13 @@ kotlin {
 }
 ```
 
-
-
 ### Gradle Kotlin DSL
 
 ```kotlin
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.usmandev0:comparekit:0.1.1")
+            implementation("io.github.usmandev0:comparekit:0.1.2")
         }
     }
 }
@@ -110,10 +110,8 @@ kotlin {
 **Maven coordinates**
 
 ```text
-io.github.usmandev0:comparekit:0.1.1
+io.github.usmandev0:comparekit:0.1.2
 ```
-
-
 
 ### Requirements
 
@@ -129,11 +127,7 @@ Your project must already use Compose Multiplatform for Android and/or iOS.
 
 ---
 
-
-
 ## Usage
-
-
 
 ### Quick Start
 
@@ -159,8 +153,6 @@ The slider starts at **50%** by default. Drag horizontally to reveal the after i
 
 ---
 
-
-
 ### Basic Example
 
 ```kotlin
@@ -180,8 +172,6 @@ fun BasicComparison(before: Painter, after: Painter) {
 ```
 
 ---
-
-
 
 ### Advanced Example
 
@@ -229,8 +219,6 @@ fun AdvancedComparison(
 
 ---
 
-
-
 ### Customization
 
 Every visual aspect of the slider has a sensible default via `CompareKitDefaults` and can be overridden per composable.
@@ -274,8 +262,6 @@ When `enabled = false`, gestures are ignored and the divider and thumb render wi
 
 ---
 
-
-
 ### Labels
 
 Add optional **Before** and **After** labels with default styling or fully custom composables.
@@ -290,8 +276,6 @@ BeforeAfterSlider(
 )
 ```
 
-
-
 #### Custom labels
 
 ```kotlin
@@ -305,8 +289,6 @@ BeforeAfterSlider(
 )
 ```
 
-
-
 #### Hide labels
 
 ```kotlin
@@ -317,8 +299,6 @@ BeforeAfterSlider(
     showAfterLabel = false,
 )
 ```
-
-
 
 #### Label alignments
 
@@ -336,8 +316,6 @@ BeforeAfterSlider(
 Labels are drawn above images, respect corner radius clipping, and do not block slider dragging.
 
 ---
-
-
 
 ### Gestures
 
@@ -367,24 +345,32 @@ Set `enabled = false` to disable all gestures.
 
 ---
 
-
-
 ### Vertical Slider
 
-> **Coming soon** — Vertical before/after comparison is on the [roadmap](#roadmap). The current release supports **horizontal** sliders.
+Use `SliderOrientation.Vertical` to compare images along the vertical axis. The after image appears above the divider and the before image below it. Drag up or down to reveal more of either image.
 
 ```kotlin
-// Planned API (not yet available)
-// BeforeAfterSlider(
-//     orientation = SliderOrientation.Vertical,
-//     before = beforePainter,
-//     after = afterPainter,
-// )
+BeforeAfterSlider(
+    orientation = SliderOrientation.Vertical,
+    before = beforePainter,
+    after = afterPainter,
+    modifier = Modifier
+        .fillMaxWidth()
+        .height(240.dp),
+)
+```
+
+Horizontal is the default when `orientation` is omitted:
+
+```kotlin
+BeforeAfterSlider(
+    orientation = SliderOrientation.Horizontal, // default
+    before = beforePainter,
+    after = afterPainter,
+)
 ```
 
 ---
-
-
 
 ### State API
 
@@ -420,11 +406,7 @@ fun StatefulComparison(before: Painter, after: Painter) {
 
 ---
 
-
-
 ## Configuration
-
-
 
 ### `CompareKitDefaults`
 
@@ -444,8 +426,6 @@ fun StatefulComparison(before: Painter, after: Painter) {
 | `DisabledAlpha`    | `0.38f`                   |
 
 
-
-
 ### `CompareLabelDefaults`
 
 
@@ -462,11 +442,7 @@ fun StatefulComparison(before: Painter, after: Painter) {
 
 ---
 
-
-
 ## Screenshots
-
-
 
 
 | Basic | Customized | Labels |
@@ -480,13 +456,9 @@ fun StatefulComparison(before: Painter, after: Painter) {
 |          |               |            |
 
 
-
-
 > Add your screenshots to `docs/images/` and they will render automatically.
 
 ---
-
-
 
 ## Platform Support
 
@@ -501,8 +473,6 @@ fun StatefulComparison(before: Painter, after: Painter) {
 
 
 ---
-
-
 
 ## API Overview
 
@@ -524,30 +494,39 @@ fun StatefulComparison(before: Painter, after: Painter) {
 
 ---
 
+## Changelog
 
+See [CHANGELOG.md](CHANGELOG.md) for the full release history.
+
+**v0.1.2** (latest)
+
+- Vertical slider — `SliderOrientation.Vertical` for top/bottom comparison
+- Coil image loading — `CompareImageSource` with URL, file, drawable, and bitmap support
+- Thumb icon and vertical label positioning fixes
+
+---
 
 ## Sample App
 
-The repository includes a full interactive demo in the `sample` module.
+The repository includes a full interactive demo in the `androidApp` module.
 
 ```bash
 git clone https://github.com/usmandev0/comparekit.git
 cd comparekit
-./gradlew :sample:installDebug
+./gradlew :androidApp:installDebug
 ```
 
 The sample demonstrates:
 
 1. **Basic Slider** — default configuration
-2. **Customization** — divider, thumb, corners, and visibility
-3. **Labels** — default, custom, hidden, and alignment options
-4. **Gestures** — drag, double-tap reset, and long press
-5. **Orientation** — horizontal slider (vertical coming soon)
-6. **Live Controls** — shared controls that update all sliders
+2. **Coil & Custom Thumb** — remote images and thumb icons
+3. **Customization** — divider, thumb, corners, and visibility
+4. **Labels** — default, custom, hidden, and alignment options
+5. **Gestures** — drag, double-tap reset, and long press
+6. **Orientation** — horizontal and vertical sliders
+7. **Live Controls** — shared controls that update all sliders
 
 ---
-
-
 
 ## Performance
 
@@ -560,8 +539,6 @@ CompareKit is designed to be lightweight and recomposes efficiently.
 - **Gesture isolation** — label overlays use pointer passthrough so dragging stays smooth
 
 ---
-
-
 
 ## Why CompareKit?
 
@@ -577,8 +554,6 @@ CompareKit is designed to be lightweight and recomposes efficiently.
 
 ---
 
-
-
 ## Roadmap
 
 
@@ -588,7 +563,7 @@ CompareKit is designed to be lightweight and recomposes efficiently.
 | Customization API                       | ✅ Available |
 | Labels                                  | ✅ Available |
 | Gestures (drag, double-tap, long press) | ✅ Available |
-| Vertical slider                         | 🔜 Planned  |
+| Vertical slider                         | ✅ Available |
 | Zoom                                    | 🔜 Planned  |
 | Magnifier                               | 🔜 Planned  |
 | Video comparison                        | 🔜 Planned  |
@@ -601,8 +576,6 @@ Track progress and propose features on [GitHub Issues](https://github.com/usmand
 
 ---
 
-
-
 ## Contributing
 
 Contributions are welcome and appreciated.
@@ -612,8 +585,6 @@ Contributions are welcome and appreciated.
 3. **Commit** your changes (`git commit -m "Add my feature"`)
 4. **Push** to the branch (`git push origin feature/my-feature`)
 5. **Open** a Pull Request
-
-
 
 ### Development
 
@@ -631,8 +602,6 @@ Contributions are welcome and appreciated.
 Please follow [Kotlin Coding Conventions](https://kotlinlang.org/docs/coding-conventions.html) and keep changes focused.
 
 ---
-
-
 
 ## License
 
@@ -654,8 +623,6 @@ limitations under the License.
 
 ---
 
-
-
 ## Author
 
 **Usman**
@@ -664,8 +631,6 @@ limitations under the License.
 - Repository: [github.com/usmandev0/comparekit](https://github.com/usmandev0/comparekit)
 
 ---
-
-
 
 ## Support
 
@@ -678,14 +643,8 @@ If CompareKit helps your project, consider:
 
 ---
 
-
-
 ### Star History
 
 [Star History Chart](https://star-history.com/#usmandev0/comparekit&Date)
 
-  
-
-
 **Made with ❤️ using Kotlin Multiplatform and Compose Multiplatform**
-

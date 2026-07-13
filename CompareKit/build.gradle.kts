@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "io.github.usmandev0"
-version = "0.1.1"
+version = libs.versions.compareKit.get()
 
 kotlin {
     android {
@@ -49,11 +49,14 @@ kotlin {
         }
 
         androidMain.dependencies {
-            //put your multiplatform dependencies here
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.okhttp)
         }
 
         iosMain.dependencies {
-            //put your multiplatform dependencies here
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
+            implementation(libs.ktor.client.darwin)
         }
     }
 }

@@ -8,9 +8,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
 /**
- * Holds the horizontal progress of a [BeforeAfterSlider].
+ * Holds the reveal progress of a [BeforeAfterSlider].
  *
- * Progress is expressed as a fraction of the slider width in the range
+ * Progress is expressed as a fraction of the slider axis in the range
  * `[`[MinProgress]`,`[MaxProgress]`]`, where `0f` shows only the before image
  * and `1f` shows the after image fully.
  *

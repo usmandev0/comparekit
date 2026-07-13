@@ -24,27 +24,28 @@ import androidx.compose.ui.unit.DpOffset
 /**
  * Vertical and horizontal placement of before and after labels on [BeforeAfterSlider].
  *
- * Before labels anchor to the left image region; after labels anchor to the right
- * image region. Horizontal positions mirror each other so labels stay near their
- * respective image sides.
+ * For horizontal sliders, before labels anchor to the left image region and after labels
+ * anchor to the right image region. For vertical sliders, before labels anchor to the
+ * bottom image region and after labels anchor to the top image region. Positions mirror
+ * each other so labels stay near their respective image sides.
  */
 enum class CompareLabelAlignment {
-    /** Before at the top-start; after at the top-end. */
+    /** Before at the top-start; after at the top-end (horizontal) or top-start (vertical). */
     TopStart,
 
-    /** Before at the top-center of the left region; after at the top-center of the right region. */
+    /** Before at the top-center of the before region; after at the top-center of the after region. */
     TopCenter,
 
-    /** Before at the top-end of the left region; after at the top-start of the right region. */
+    /** Before at the top-end of the before region; after at the top-start of the after region. */
     TopEnd,
 
-    /** Before at the bottom-start; after at the bottom-end. */
+    /** Before at the bottom-start; after at the bottom-end (horizontal) or bottom-start (vertical). */
     BottomStart,
 
-    /** Before at the bottom-center of the left region; after at the bottom-center of the right region. */
+    /** Before at the bottom-center of the before region; after at the bottom-center of the after region. */
     BottomCenter,
 
-    /** Before at the bottom-end of the left region; after at the bottom-start of the right region. */
+    /** Before at the bottom-end of the before region; after at the bottom-start of the after region. */
     BottomEnd,
 }
 
@@ -88,6 +89,7 @@ fun CompareLabel(
  * @param showBeforeLabel when `false`, the before label is not drawn.
  * @param showAfterLabel when `false`, the after label is not drawn.
  * @param alignment shared alignment used to position both labels within their image regions.
+ * @param orientation slider orientation used to split label regions.
  * @param padding inset between labels and the slider edges.
  * @param offset additional offset applied to the label overlay.
  * @param beforeLabel composable content for the before label.
@@ -99,6 +101,7 @@ internal fun CompareSliderLabels(
     showBeforeLabel: Boolean,
     showAfterLabel: Boolean,
     alignment: CompareLabelAlignment,
+    orientation: SliderOrientation,
     padding: Dp,
     offset: DpOffset,
     beforeLabel: @Composable () -> Unit,
@@ -114,27 +117,50 @@ internal fun CompareSliderLabels(
             .padding(padding)
             .offset(x = offset.x, y = offset.y),
     ) {
-        if (showBeforeLabel) {
-            CompareLabelRegion(
-                modifier = Modifier.align(Alignment.CenterStart),
-                horizontalAlignment = alignment.beforeHorizontalAlignment(),
-                verticalAlignment = alignment.verticalAlignment(),
-                content = beforeLabel,
-            )
-        }
-        if (showAfterLabel) {
-            CompareLabelRegion(
-                modifier = Modifier.align(Alignment.CenterEnd),
-                horizontalAlignment = alignment.afterHorizontalAlignment(),
-                verticalAlignment = alignment.verticalAlignment(),
-                content = afterLabel,
-            )
+        when (orientation) {
+            SliderOrientation.Horizontal -> {
+                if (showBeforeLabel) {
+                    CompareHorizontalLabelRegion(
+                        modifier = Modifier.align(Alignment.CenterStart),
+                        horizontalAlignment = alignment.beforeHorizontalAlignment(),
+                        verticalAlignment = alignment.verticalAlignment(),
+                        content = beforeLabel,
+                    )
+                }
+                if (showAfterLabel) {
+                    CompareHorizontalLabelRegion(
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                        horizontalAlignment = alignment.afterHorizontalAlignment(),
+                        verticalAlignment = alignment.verticalAlignment(),
+                        content = afterLabel,
+                    )
+                }
+            }
+
+            SliderOrientation.Vertical -> {
+                if (showAfterLabel) {
+                    CompareVerticalLabelRegion(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        horizontalAlignment = alignment.afterVerticalHorizontalAlignment(),
+                        verticalAlignment = alignment.afterVerticalAlignment(),
+                        content = afterLabel,
+                    )
+                }
+                if (showBeforeLabel) {
+                    CompareVerticalLabelRegion(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        horizontalAlignment = alignment.beforeVerticalHorizontalAlignment(),
+                        verticalAlignment = alignment.beforeVerticalAlignment(),
+                        content = beforeLabel,
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun CompareLabelRegion(
+private fun CompareHorizontalLabelRegion(
     horizontalAlignment: Alignment.Horizontal,
     verticalAlignment: Alignment.Vertical,
     content: @Composable () -> Unit,
@@ -143,7 +169,32 @@ private fun CompareLabelRegion(
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .fillMaxWidth(CompareLabelLayout.HalfWidthFraction),
+            .fillMaxWidth(CompareLabelLayout.HalfFraction),
+    ) {
+        Box(
+            modifier = Modifier.align(
+                toBoxAlignment(
+                    horizontal = horizontalAlignment,
+                    vertical = verticalAlignment,
+                ),
+            ),
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+private fun CompareVerticalLabelRegion(
+    horizontalAlignment: Alignment.Horizontal,
+    verticalAlignment: Alignment.Vertical,
+    content: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(CompareLabelLayout.HalfFraction),
     ) {
         Box(
             modifier = Modifier.align(
@@ -219,6 +270,58 @@ private fun CompareLabelAlignment.afterHorizontalAlignment(): Alignment.Horizont
     -> Alignment.Start
 }
 
+private fun CompareLabelAlignment.afterVerticalAlignment(): Alignment.Vertical = when (this) {
+    CompareLabelAlignment.TopStart,
+    CompareLabelAlignment.TopCenter,
+    CompareLabelAlignment.TopEnd,
+    -> Alignment.Top
+
+    CompareLabelAlignment.BottomStart,
+    CompareLabelAlignment.BottomCenter,
+    CompareLabelAlignment.BottomEnd,
+    -> Alignment.Bottom
+}
+
+private fun CompareLabelAlignment.beforeVerticalAlignment(): Alignment.Vertical = when (this) {
+    CompareLabelAlignment.TopStart,
+    CompareLabelAlignment.TopCenter,
+    CompareLabelAlignment.TopEnd,
+    -> Alignment.Bottom
+
+    CompareLabelAlignment.BottomStart,
+    CompareLabelAlignment.BottomCenter,
+    CompareLabelAlignment.BottomEnd,
+    -> Alignment.Top
+}
+
+private fun CompareLabelAlignment.afterVerticalHorizontalAlignment(): Alignment.Horizontal = when (this) {
+    CompareLabelAlignment.TopStart,
+    CompareLabelAlignment.BottomStart,
+    -> Alignment.Start
+
+    CompareLabelAlignment.TopCenter,
+    CompareLabelAlignment.BottomCenter,
+    -> Alignment.CenterHorizontally
+
+    CompareLabelAlignment.TopEnd,
+    CompareLabelAlignment.BottomEnd,
+    -> Alignment.End
+}
+
+private fun CompareLabelAlignment.beforeVerticalHorizontalAlignment(): Alignment.Horizontal = when (this) {
+    CompareLabelAlignment.TopStart,
+    CompareLabelAlignment.BottomStart,
+    -> Alignment.Start
+
+    CompareLabelAlignment.TopCenter,
+    CompareLabelAlignment.BottomCenter,
+    -> Alignment.CenterHorizontally
+
+    CompareLabelAlignment.TopEnd,
+    CompareLabelAlignment.BottomEnd,
+    -> Alignment.End
+}
+
 /**
  * Forwards pointer events to underlying slider content so labels do not block dragging.
  */
@@ -231,5 +334,5 @@ private fun Modifier.compareLabelPointerPassthrough(): Modifier = pointerInput(U
 }
 
 private object CompareLabelLayout {
-    const val HalfWidthFraction: Float = 0.5f
+    const val HalfFraction: Float = 0.5f
 }

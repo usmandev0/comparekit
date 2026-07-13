@@ -13,12 +13,12 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 /**
- * Attaches horizontal drag, double-tap reset, and long-press handling to a
- * [BeforeAfterSlider].
+ * Attaches drag, double-tap reset, and long-press handling to a [BeforeAfterSlider].
  *
  * @param state the slider state whose progress is updated by gestures.
  * @param sizeProvider supplies the current layout size used to convert
  * pixel deltas into progress fractions.
+ * @param orientation drag axis used to update slider progress.
  * @param enabled when `false`, all gestures are ignored.
  * @param doubleTapToReset when `true`, a double tap animates [state] back to
  * [defaultSliderPosition].
@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 internal fun Modifier.sliderGestures(
     state: SliderState,
     sizeProvider: () -> IntSize,
+    orientation: SliderOrientation = SliderOrientation.Horizontal,
     enabled: Boolean = true,
     doubleTapToReset: Boolean = true,
     defaultSliderPosition: Float = CompareKitDefaults.SliderPosition,
@@ -39,7 +40,7 @@ internal fun Modifier.sliderGestures(
 
     val resetTarget = defaultSliderPosition.coerceIn(SliderState.MinProgress, SliderState.MaxProgress)
 
-    return pointerInput(state, doubleTapToReset, resetTarget) {
+    return pointerInput(state, orientation, doubleTapToReset, resetTarget) {
         coroutineScope {
             val progressAnimatable = Animatable(state.progress)
             var resetAnimationJob: Job? = null
@@ -51,9 +52,13 @@ internal fun Modifier.sliderGestures(
                     },
                     onDrag = { change, dragAmount ->
                         change.consume()
-                        val width = sizeProvider().width
-                        if (width <= 0) return@detectDragGestures
-                        val nextProgress = state.progress + (dragAmount.x / width.toFloat())
+                        val primaryDimension = sliderPrimaryDimension(sizeProvider(), orientation)
+                        if (primaryDimension <= 0f) return@detectDragGestures
+                        val dragDelta = when (orientation) {
+                            SliderOrientation.Horizontal -> dragAmount.x
+                            SliderOrientation.Vertical -> dragAmount.y
+                        }
+                        val nextProgress = state.progress + (dragDelta / primaryDimension)
                         state.updateProgress(nextProgress)
                     },
                 )
