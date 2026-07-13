@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CompareKit"
 include(":CompareKit")
-include(":sample")
+include(":androidApp")

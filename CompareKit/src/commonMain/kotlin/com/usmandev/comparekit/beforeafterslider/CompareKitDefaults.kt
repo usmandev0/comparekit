@@ -10,16 +10,16 @@ import androidx.compose.ui.unit.dp
  * Default visual and behavioral values for [BeforeAfterSlider].
  */
 object CompareKitDefaults {
-    /** Default horizontal slider position as a fraction of width (`0f`–`1f`). */
+    /** Default slider position as a fraction of the slider axis (`0f`–`1f`). */
     const val SliderPosition: Float = 0.5f
 
     /** Alpha multiplier applied to the divider and thumb when [BeforeAfterSlider] is disabled. */
     const val DisabledAlpha: Float = 0.38f
 
-    /** Color of the vertical divider line. */
+    /** Color of the divider line. */
     val DividerColor: Color = Color.White
 
-    /** Thickness of the vertical divider line. */
+    /** Stroke thickness of the divider line. */
     val DividerThickness: Dp = 2.dp
 
     /** Fill color of the drag thumb. */
@@ -36,6 +36,9 @@ object CompareKitDefaults {
 
     /** Border width drawn around the thumb. */
     val ThumbBorderWidth: Dp = 1.dp
+
+    /** Padding applied around a [BeforeAfterSlider] thumb icon or image. */
+    val ThumbIconPadding: Dp = 4.dp
 
     /** Corner radius used to clip the slider and its images. */
     val CornerRadius: Dp = 0.dp
