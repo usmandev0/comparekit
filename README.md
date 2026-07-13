@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/comparekit-logo.png" alt="CompareKit logo" width="420" />
+  <img src="images/comparekit-logo.png" alt="CompareKit logo" width="200" height="200" />
 </p>
 
 <p align="center">
