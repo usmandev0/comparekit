@@ -1,5 +1,7 @@
 package com.usmandev.comparekit.beforeafterslider
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -33,6 +35,28 @@ class SliderState(
      */
     fun updateProgress(value: Float) {
         progress = value.coerceIn(MinProgress, MaxProgress)
+    }
+
+    /**
+     * Animates [progress] to [target], clamped to `[`[MinProgress]`,`[MaxProgress]`]`.
+     *
+     * @param target the destination progress value.
+     * @param animationSpec animation used for the transition.
+     */
+    suspend fun animateToProgress(
+        target: Float,
+        animationSpec: AnimationSpec<Float> = autoScrubAnimationSpec(
+            CompareKitDefaults.AutoScrubDurationMillis,
+        ),
+    ) {
+        val clampedTarget = target.coerceIn(MinProgress, MaxProgress)
+        val animatable = Animatable(progress)
+        animatable.animateTo(
+            targetValue = clampedTarget,
+            animationSpec = animationSpec,
+        ) {
+            updateProgress(value)
+        }
     }
 
     companion object {

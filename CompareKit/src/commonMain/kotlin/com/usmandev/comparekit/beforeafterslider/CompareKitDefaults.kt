@@ -45,4 +45,13 @@ object CompareKitDefaults {
 
     /** Background color behind the before and after images. */
     val BackgroundColor: Color = Color.Transparent
+
+    /** Default auto-scrub animation mode for [BeforeAfterSlider]. */
+    val AutoScrubAnimationMode: CompareAnimationMode = CompareAnimationMode.None
+
+    /** Duration of one auto-scrub leg (0→1 or 1→0) in milliseconds. */
+    const val AutoScrubDurationMillis: Int = 2000
+
+    /** When `true`, auto-scrub pauses while the user is dragging the slider. */
+    const val PauseAutoScrubOnInteraction: Boolean = true
 }

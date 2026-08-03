@@ -71,6 +71,9 @@ import androidx.compose.ui.unit.IntSize
  * @param labelAlignment placement of labels within their respective image regions.
  * @param labelPadding inset between labels and the slider edges.
  * @param labelOffset additional offset applied to both labels.
+ * @param animationMode automatic animation mode for the slider progress.
+ * @param autoScrubDurationMillis duration of one auto-scrub leg in milliseconds.
+ * @param pauseAutoScrubOnInteraction when `true`, auto-scrub pauses while the user drags.
  */
 @Composable
 fun BeforeAfterSlider(
@@ -107,6 +110,9 @@ fun BeforeAfterSlider(
     labelAlignment: CompareLabelAlignment = CompareLabelAlignment.TopStart,
     labelPadding: Dp = CompareLabelDefaults.Padding,
     labelOffset: DpOffset = CompareLabelDefaults.Offset,
+    animationMode: CompareAnimationMode = CompareKitDefaults.AutoScrubAnimationMode,
+    autoScrubDurationMillis: Int = CompareKitDefaults.AutoScrubDurationMillis,
+    pauseAutoScrubOnInteraction: Boolean = CompareKitDefaults.PauseAutoScrubOnInteraction,
 ) {
     BeforeAfterSlider(
         before = CompareImageSource.painter(before),
@@ -142,6 +148,9 @@ fun BeforeAfterSlider(
         labelAlignment = labelAlignment,
         labelPadding = labelPadding,
         labelOffset = labelOffset,
+        animationMode = animationMode,
+        autoScrubDurationMillis = autoScrubDurationMillis,
+        pauseAutoScrubOnInteraction = pauseAutoScrubOnInteraction,
     )
 }
 
@@ -191,6 +200,9 @@ fun BeforeAfterSlider(
     beforeError: CompareImageSource? = null,
     afterPlaceholder: CompareImageSource? = null,
     afterError: CompareImageSource? = null,
+    animationMode: CompareAnimationMode = CompareKitDefaults.AutoScrubAnimationMode,
+    autoScrubDurationMillis: Int = CompareKitDefaults.AutoScrubDurationMillis,
+    pauseAutoScrubOnInteraction: Boolean = CompareKitDefaults.PauseAutoScrubOnInteraction,
 ) {
     val beforePainter = rememberCompareImagePainter(
         source = before,
@@ -236,6 +248,9 @@ fun BeforeAfterSlider(
         labelAlignment = labelAlignment,
         labelPadding = labelPadding,
         labelOffset = labelOffset,
+        animationMode = animationMode,
+        autoScrubDurationMillis = autoScrubDurationMillis,
+        pauseAutoScrubOnInteraction = pauseAutoScrubOnInteraction,
     )
 }
 
@@ -273,8 +288,12 @@ private fun BeforeAfterSliderLayout(
     labelAlignment: CompareLabelAlignment,
     labelPadding: Dp,
     labelOffset: DpOffset,
+    animationMode: CompareAnimationMode,
+    autoScrubDurationMillis: Int,
+    pauseAutoScrubOnInteraction: Boolean,
 ) {
     var layoutSize by remember { mutableStateOf(IntSize.Zero) }
+    var isUserInteracting by remember { mutableStateOf(false) }
     val density = LocalDensity.current
     val thumbSizePx = remember(density, thumbSize) { with(density) { thumbSize.toPx() } }
     val dividerThicknessPx = remember(density, dividerThickness) {
@@ -319,6 +338,14 @@ private fun BeforeAfterSliderLayout(
         }
     }
 
+    SliderAutoScrubEffect(
+        state = state,
+        animationMode = animationMode,
+        enabled = enabled,
+        isUserInteracting = pauseAutoScrubOnInteraction && isUserInteracting,
+        durationMillis = autoScrubDurationMillis,
+    )
+
     Box(
         modifier = modifier
             .clip(clipShape)
@@ -333,6 +360,8 @@ private fun BeforeAfterSliderLayout(
                 defaultSliderPosition = defaultSliderPosition,
                 onDoubleTap = handleDoubleTap,
                 onLongPress = handleLongPress,
+                onInteractionStart = { isUserInteracting = true },
+                onInteractionEnd = { isUserInteracting = false },
             ),
     ) {
         CompareImageViewer(
