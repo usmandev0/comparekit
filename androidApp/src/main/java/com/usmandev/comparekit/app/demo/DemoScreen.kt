@@ -211,6 +211,18 @@ fun DemoScreen(
             )
             LiveControlsPanel(demoState = demoState)
         }
+
+        DemoSection(
+            title = "8. Auto Animation",
+            description = "Automatically animate the slider with PingPong or RevealOnce modes.",
+        ) {
+            AutoAnimationDemo(
+                beforePainter = beforePainter,
+                afterPainter = afterPainter,
+            )
+        }
+
+        DemoGlobalActions(demoState = demoState)
     }
 }
 
@@ -229,13 +241,13 @@ private fun DemoWhatsNewCard(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
-            text = "What's new in v0.1.2",
+            text = "What's new in v0.1.3",
             style = MaterialTheme.typography.titleSmall,
         )
         Text(
-            text = "• Vertical slider (top/bottom comparison)\n" +
-                "• Coil image loading with CompareImageSource\n" +
-                "• Thumb icon and vertical label fixes",
+            text = "• Auto-scrub animation (PingPong and RevealOnce modes)\n" +
+                "• Pause on drag while auto-animating\n" +
+                "• SliderState.animateToProgress for programmatic control",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

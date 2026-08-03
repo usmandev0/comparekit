@@ -25,6 +25,8 @@ import kotlinx.coroutines.launch
  * @param defaultSliderPosition target progress used when resetting via double tap.
  * @param onDoubleTap optional callback invoked after a double tap is detected.
  * @param onLongPress optional callback invoked when a long press is detected.
+ * @param onInteractionStart optional callback invoked when the user starts dragging.
+ * @param onInteractionEnd optional callback invoked when the user finishes or cancels a drag.
  */
 internal fun Modifier.sliderGestures(
     state: SliderState,
@@ -35,6 +37,8 @@ internal fun Modifier.sliderGestures(
     defaultSliderPosition: Float = CompareKitDefaults.SliderPosition,
     onDoubleTap: (() -> Unit)? = null,
     onLongPress: (() -> Unit)? = null,
+    onInteractionStart: (() -> Unit)? = null,
+    onInteractionEnd: (() -> Unit)? = null,
 ): Modifier {
     if (!enabled) return this
 
@@ -49,6 +53,13 @@ internal fun Modifier.sliderGestures(
                 detectDragGestures(
                     onDragStart = {
                         resetAnimationJob?.cancel()
+                        onInteractionStart?.invoke()
+                    },
+                    onDragEnd = {
+                        onInteractionEnd?.invoke()
+                    },
+                    onDragCancel = {
+                        onInteractionEnd?.invoke()
                     },
                     onDrag = { change, dragAmount ->
                         change.consume()

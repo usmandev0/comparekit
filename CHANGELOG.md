@@ -9,6 +9,20 @@ All notable changes to CompareKit are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-08-03
+
+### Added
+
+- **Auto-scrub animation** — `CompareAnimationMode` with `PingPong` (0→1→0 loop) and `RevealOnce` (one-shot reveal) modes on `BeforeAfterSlider`.
+- **Animation parameters** — `animationMode`, `autoScrubDurationMillis`, and `pauseAutoScrubOnInteraction` with defaults in `CompareKitDefaults`.
+- **SliderState.animateToProgress()** — suspend helper for programmatic animated progress updates.
+- **Demo app** — section 8 with mode, speed, and pause-on-drag controls.
+
+### Changed
+
+- Extended `sliderGestures` with `onInteractionStart` / `onInteractionEnd` callbacks to pause auto-scrub during user drag.
+- Updated README with auto animation documentation and roadmap status.
+
 ## [0.1.2] - 2026-07-13
 
 ### Added
@@ -63,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed before/after image background bleed at clip boundaries.
 
+[0.1.3]: https://github.com/usmandev0/comparekit/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/usmandev0/comparekit/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/usmandev0/comparekit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/usmandev0/comparekit/releases/tag/v0.1.0

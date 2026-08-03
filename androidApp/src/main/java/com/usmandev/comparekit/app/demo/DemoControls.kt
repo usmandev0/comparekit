@@ -170,11 +170,6 @@ fun CustomizationControls(
             checked = demoState.showThumb,
             onCheckedChange = { demoState.showThumb = it },
         )
-        SwitchControl(
-            label = "Enabled",
-            checked = demoState.enabled,
-            onCheckedChange = { demoState.enabled = it },
-        )
     }
 }
 
@@ -215,26 +210,47 @@ fun LiveControlsPanel(
             valueRange = DemoCornerRadiusRange,
             onValueChange = { demoState.cornerRadius = it },
         )
-        SwitchControl(
-            label = "Enabled",
-            checked = demoState.enabled,
-            onCheckedChange = { demoState.enabled = it },
-        )
-        Row(
+    }
+}
+
+/**
+ * Global enabled toggle and reset actions shown at the bottom of the demo screen.
+ */
+@Composable
+fun DemoGlobalActions(
+    demoState: DemoState,
+    modifier: Modifier = Modifier,
+) {
+    DemoSection(
+        title = "Enabled & Reset",
+        description = "Enable or disable connected sliders and reset their state.",
+        modifier = modifier,
+    ) {
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            OutlinedButton(
-                onClick = demoState::resetPosition,
-                modifier = Modifier.weight(1f),
+            SwitchControl(
+                label = "Enabled",
+                checked = demoState.enabled,
+                onCheckedChange = { demoState.enabled = it },
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text("Reset position")
-            }
-            Button(
-                onClick = demoState::resetAll,
-                modifier = Modifier.weight(1f),
-            ) {
-                Text("Reset all")
+                OutlinedButton(
+                    onClick = demoState::resetPosition,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Reset position")
+                }
+                Button(
+                    onClick = demoState::resetAll,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Reset all")
+                }
             }
         }
     }
