@@ -24,6 +24,18 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
+import com.usmandev.comparekit.beforeafterslider.internal.CompareSliderLabels
+import com.usmandev.comparekit.beforeafterslider.internal.SliderAutoScrubEffect
+import com.usmandev.comparekit.beforeafterslider.internal.SliderDivider
+import com.usmandev.comparekit.beforeafterslider.internal.SliderThumb
+import com.usmandev.comparekit.beforeafterslider.internal.compareSliderKeyboard
+import com.usmandev.comparekit.beforeafterslider.internal.compareSliderSemantics
+import com.usmandev.comparekit.beforeafterslider.internal.resolveCompareSliderContentDescription
+import com.usmandev.comparekit.beforeafterslider.internal.sliderClipBounds
+import com.usmandev.comparekit.beforeafterslider.internal.sliderDividerAlignment
+import com.usmandev.comparekit.beforeafterslider.internal.sliderDividerOffset
+import com.usmandev.comparekit.beforeafterslider.internal.sliderGestures
+import com.usmandev.comparekit.beforeafterslider.internal.sliderThumbOffset
 
 /**
  * A before/after image comparison slider built with Compose Multiplatform.
@@ -74,6 +86,10 @@ import androidx.compose.ui.unit.IntSize
  * @param animationMode automatic animation mode for the slider progress.
  * @param autoScrubDurationMillis duration of one auto-scrub leg in milliseconds.
  * @param pauseAutoScrubOnInteraction when `true`, auto-scrub pauses while the user drags.
+ * @param contentDescription accessibility label for the slider as a whole.
+ * @param beforeContentDescription optional description of the before image.
+ * @param afterContentDescription optional description of the after image.
+ * @param progressStep fraction used for keyboard and accessibility progress steps.
  */
 @Composable
 fun BeforeAfterSlider(
@@ -113,6 +129,10 @@ fun BeforeAfterSlider(
     animationMode: CompareAnimationMode = CompareKitDefaults.AutoScrubAnimationMode,
     autoScrubDurationMillis: Int = CompareKitDefaults.AutoScrubDurationMillis,
     pauseAutoScrubOnInteraction: Boolean = CompareKitDefaults.PauseAutoScrubOnInteraction,
+    contentDescription: String = CompareKitDefaults.ContentDescription,
+    beforeContentDescription: String? = null,
+    afterContentDescription: String? = null,
+    progressStep: Float = CompareKitDefaults.ProgressStep,
 ) {
     BeforeAfterSlider(
         before = CompareImageSource.painter(before),
@@ -151,6 +171,10 @@ fun BeforeAfterSlider(
         animationMode = animationMode,
         autoScrubDurationMillis = autoScrubDurationMillis,
         pauseAutoScrubOnInteraction = pauseAutoScrubOnInteraction,
+        contentDescription = contentDescription,
+        beforeContentDescription = beforeContentDescription,
+        afterContentDescription = afterContentDescription,
+        progressStep = progressStep,
     )
 }
 
@@ -161,6 +185,7 @@ fun BeforeAfterSlider(
  * such as URLs, files, drawables, and bitmaps. Local [Painter] instances are supported via
  * [CompareImageSource.painter].
  */
+@Suppress("ParamsComparedByRef")
 @Composable
 fun BeforeAfterSlider(
     before: CompareImageSource,
@@ -203,6 +228,10 @@ fun BeforeAfterSlider(
     animationMode: CompareAnimationMode = CompareKitDefaults.AutoScrubAnimationMode,
     autoScrubDurationMillis: Int = CompareKitDefaults.AutoScrubDurationMillis,
     pauseAutoScrubOnInteraction: Boolean = CompareKitDefaults.PauseAutoScrubOnInteraction,
+    contentDescription: String = CompareKitDefaults.ContentDescription,
+    beforeContentDescription: String? = null,
+    afterContentDescription: String? = null,
+    progressStep: Float = CompareKitDefaults.ProgressStep,
 ) {
     val beforePainter = rememberCompareImagePainter(
         source = before,
@@ -251,9 +280,14 @@ fun BeforeAfterSlider(
         animationMode = animationMode,
         autoScrubDurationMillis = autoScrubDurationMillis,
         pauseAutoScrubOnInteraction = pauseAutoScrubOnInteraction,
+        contentDescription = contentDescription,
+        beforeContentDescription = beforeContentDescription,
+        afterContentDescription = afterContentDescription,
+        progressStep = progressStep,
     )
 }
 
+@Suppress("ParamsComparedByRef")
 @Composable
 private fun BeforeAfterSliderLayout(
     before: Painter,
@@ -291,6 +325,10 @@ private fun BeforeAfterSliderLayout(
     animationMode: CompareAnimationMode,
     autoScrubDurationMillis: Int,
     pauseAutoScrubOnInteraction: Boolean,
+    contentDescription: String,
+    beforeContentDescription: String?,
+    afterContentDescription: String?,
+    progressStep: Float,
 ) {
     var layoutSize by remember { mutableStateOf(IntSize.Zero) }
     var isUserInteracting by remember { mutableStateOf(false) }
@@ -323,6 +361,17 @@ private fun BeforeAfterSliderLayout(
             thumbBorderColor.copy(alpha = thumbBorderColor.alpha * CompareKitDefaults.DisabledAlpha)
         }
     }
+    val resolvedContentDescription = remember(
+        contentDescription,
+        beforeContentDescription,
+        afterContentDescription,
+    ) {
+        resolveCompareSliderContentDescription(
+            contentDescription = contentDescription,
+            beforeContentDescription = beforeContentDescription,
+            afterContentDescription = afterContentDescription,
+        )
+    }
     val currentOnDoubleTap = rememberUpdatedState(onDoubleTap)
     val currentOnLongPress = rememberUpdatedState(onLongPress)
     val handleDoubleTap = remember {
@@ -351,6 +400,17 @@ private fun BeforeAfterSliderLayout(
             .clip(clipShape)
             .background(backgroundColor)
             .onSizeChanged { layoutSize = it }
+            .compareSliderSemantics(
+                state = state,
+                contentDescription = resolvedContentDescription,
+                enabled = enabled,
+            )
+            .compareSliderKeyboard(
+                state = state,
+                orientation = orientation,
+                enabled = enabled,
+                progressStep = progressStep,
+            )
             .sliderGestures(
                 state = state,
                 sizeProvider = { layoutSize },

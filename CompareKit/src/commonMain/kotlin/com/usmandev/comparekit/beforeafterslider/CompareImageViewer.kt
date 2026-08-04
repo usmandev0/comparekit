@@ -37,6 +37,7 @@ fun CompareImageViewer(
 /**
  * Displays an image from a resolved [Painter].
  */
+@Suppress("ParamsComparedByRef")
 @Composable
 fun CompareImageViewer(
     painter: Painter,

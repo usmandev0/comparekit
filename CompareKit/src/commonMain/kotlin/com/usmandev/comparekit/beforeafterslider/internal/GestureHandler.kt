@@ -1,4 +1,4 @@
-package com.usmandev.comparekit.beforeafterslider
+package com.usmandev.comparekit.beforeafterslider.internal
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -8,25 +8,15 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntSize
+import com.usmandev.comparekit.beforeafterslider.CompareKitDefaults
+import com.usmandev.comparekit.beforeafterslider.SliderOrientation
+import com.usmandev.comparekit.beforeafterslider.SliderState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 /**
- * Attaches drag, double-tap reset, and long-press handling to a [BeforeAfterSlider].
- *
- * @param state the slider state whose progress is updated by gestures.
- * @param sizeProvider supplies the current layout size used to convert
- * pixel deltas into progress fractions.
- * @param orientation drag axis used to update slider progress.
- * @param enabled when `false`, all gestures are ignored.
- * @param doubleTapToReset when `true`, a double tap animates [state] back to
- * [defaultSliderPosition].
- * @param defaultSliderPosition target progress used when resetting via double tap.
- * @param onDoubleTap optional callback invoked after a double tap is detected.
- * @param onLongPress optional callback invoked when a long press is detected.
- * @param onInteractionStart optional callback invoked when the user starts dragging.
- * @param onInteractionEnd optional callback invoked when the user finishes or cancels a drag.
+ * Attaches drag, double-tap reset, and long-press handling to a before/after slider.
  */
 internal fun Modifier.sliderGestures(
     state: SliderState,

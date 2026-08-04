@@ -9,6 +9,17 @@ All notable changes to CompareKit are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Accessibility** — `contentDescription`, `beforeContentDescription`, `afterContentDescription`, and `progressStep` on `BeforeAfterSlider`, with progress semantics (range, `setProgress`, `stateDescription`) and keyboard navigation (arrows, Home, End).
+- **Accessibility defaults** — `CompareKitDefaults.ContentDescription` and `CompareKitDefaults.ProgressStep`.
+
+### Changed
+
+- Reorganized library internals into `defaults/` and `internal/` packages. Public imports stay the same via root typealiases for `CompareKitDefaults` and `CompareLabelDefaults`.
+
 ## [0.1.3] - 2026-08-03
 
 ### Added

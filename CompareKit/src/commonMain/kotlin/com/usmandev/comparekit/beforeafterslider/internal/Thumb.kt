@@ -1,4 +1,4 @@
-package com.usmandev.comparekit.beforeafterslider
+package com.usmandev.comparekit.beforeafterslider.internal
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -20,24 +20,12 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import com.usmandev.comparekit.beforeafterslider.CompareKitDefaults
 
 /**
  * Draws a thumb centered within its layout bounds.
- *
- * When [content] is provided it fully replaces the default thumb rendering.
- * When [painter] is provided the image is clipped to [shape] with an optional border.
- * Otherwise a solid [color] shape is drawn.
- *
- * @param modifier layout modifier applied to the thumb.
- * @param size width and height of the thumb.
- * @param color fill color of the thumb when no [painter] is supplied.
- * @param shape shape of the thumb.
- * @param borderWidth width of the optional border stroke.
- * @param borderColor color of the optional border stroke.
- * @param painter optional icon or image displayed inside the thumb.
- * @param painterPadding inset applied around [painter] inside the thumb.
- * @param content optional custom thumb composable that receives a sized [Modifier].
  */
+@Suppress("ParamsComparedByRef")
 @Composable
 internal fun SliderThumb(
     modifier: Modifier = Modifier,

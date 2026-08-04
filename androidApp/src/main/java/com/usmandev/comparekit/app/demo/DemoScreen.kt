@@ -222,6 +222,32 @@ fun DemoScreen(
             )
         }
 
+        DemoSection(
+            title = "9. Accessibility",
+            description = "Slider semantics for TalkBack, content descriptions, and keyboard steps.",
+        ) {
+            val a11yState = rememberCompareSliderState()
+            BeforeAfterSlider(
+                before = beforePainter,
+                after = afterPainter,
+                state = a11yState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(DemoSliderHeight),
+                cornerRadius = 12.dp,
+                contentDescription = "Photo retouch comparison",
+                beforeContentDescription = "Original photo",
+                afterContentDescription = "Edited photo",
+                progressStep = 0.05f,
+            )
+            Text(
+                text = "TalkBack announces progress. Focus the slider and use arrow keys " +
+                    "(±5%), Home, or End. Images stay decorative; descriptions are on the slider.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
         DemoGlobalActions(demoState = demoState)
     }
 }
@@ -241,13 +267,13 @@ private fun DemoWhatsNewCard(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
-            text = "What's new in v0.1.3",
+            text = "What's new (Unreleased)",
             style = MaterialTheme.typography.titleSmall,
         )
         Text(
-            text = "• Auto-scrub animation (PingPong and RevealOnce modes)\n" +
-                "• Pause on drag while auto-animating\n" +
-                "• SliderState.animateToProgress for programmatic control",
+            text = "• Accessibility: content descriptions, progress semantics, keyboard steps\n" +
+                "• Defaults reorganized under defaults/; internals under internal/\n" +
+                "• Public imports unchanged via typealiases",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

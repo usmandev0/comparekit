@@ -1,4 +1,4 @@
-package com.usmandev.comparekit.beforeafterslider
+package com.usmandev.comparekit.beforeafterslider.internal
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -10,15 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import com.usmandev.comparekit.beforeafterslider.CompareKitDefaults
+import com.usmandev.comparekit.beforeafterslider.SliderOrientation
 
 /**
  * Draws the divider line that spans the full cross-axis of its parent.
- *
- * @param modifier layout modifier applied to the divider canvas.
- * @param orientation when [SliderOrientation.Horizontal], draws a vertical line;
- * when [SliderOrientation.Vertical], draws a horizontal line.
- * @param thickness stroke thickness of the divider line.
- * @param color color of the divider line.
  */
 @Composable
 internal fun SliderDivider(

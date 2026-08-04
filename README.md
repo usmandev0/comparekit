@@ -28,6 +28,7 @@ A Compose Multiplatform library for interactive before/after image sliders. One 
 - Auto-scrub animation (PingPong, RevealOnce)
 - Coil image loading via `CompareImageSource`
 - Hoisted `SliderState` for full control
+- Accessibility: slider semantics, progress, and keyboard navigation
 
 **Platforms:** Android (`minSdk 24`), iOS (`iosArm64`, `iosSimulatorArm64`)
 
@@ -166,6 +167,21 @@ BeforeAfterSlider(
 )
 ```
 
+### Accessibility
+
+The slider exposes progress semantics (`progressBarRangeInfo`, `setProgress`, `stateDescription`) and keyboard support (arrows ± step, Home/End). Images stay decorative; describe them via optional params when needed.
+
+```kotlin
+BeforeAfterSlider(
+    before = before,
+    after = after,
+    contentDescription = "Photo retouch comparison",
+    beforeContentDescription = "Original photo",
+    afterContentDescription = "Edited photo",
+    progressStep = 0.05f,
+)
+```
+
 ---
 
 ## API at a glance
@@ -177,7 +193,7 @@ BeforeAfterSlider(
 | `rememberCompareSliderState()` | Create state |
 | `CompareAnimationMode` | Auto-scrub modes |
 | `CompareImageSource` | Coil / Painter images |
-| `CompareKitDefaults` | Default styling values |
+| `CompareKitDefaults` | Default styling and a11y values |
 
 **Package:** `com.usmandev.comparekit.beforeafterslider`
 
@@ -191,7 +207,7 @@ cd comparekit
 ./gradlew :androidApp:installDebug
 ```
 
-The demo covers basic usage, Coil loading, customization, labels, gestures, orientation, live controls, and auto animation.
+The demo covers basic usage, Coil loading, customization, labels, gestures, orientation, live controls, auto animation, and accessibility.
 
 ---
 
@@ -201,7 +217,7 @@ The demo covers basic usage, Coil loading, customization, labels, gestures, orie
 | --- | --- |
 | Zoom, magnifier, video comparison | Planned |
 | Desktop & Web targets | Planned |
-| Accessibility improvements | Planned |
+| Accessibility improvements | Done |
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
 
