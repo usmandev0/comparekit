@@ -24,10 +24,12 @@ A Compose Multiplatform library for interactive before/after image sliders. One 
 **Highlights**
 
 - Horizontal and vertical sliders
+- Synced pinch-zoom and pan (both images stay aligned)
 - Custom thumb, divider, labels, and gestures
 - Auto-scrub animation (PingPong, RevealOnce)
 - Coil image loading via `CompareImageSource`
 - Hoisted `SliderState` for full control
+- Accessibility: slider semantics, progress, and keyboard navigation
 
 **Platforms:** Android (`minSdk 24`), iOS (`iosArm64`, `iosSimulatorArm64`)
 
@@ -38,7 +40,7 @@ A Compose Multiplatform library for interactive before/after image sliders. One 
 Add to your shared `commonMain` dependencies:
 
 ```kotlin
-implementation("io.github.usmandev0:comparekit:0.1.3")
+implementation("io.github.usmandev0:comparekit:0.1.4")
 ```
 
 **Requirements:** Kotlin 2.4+, Compose Multiplatform 1.11.1+
@@ -49,7 +51,7 @@ implementation("io.github.usmandev0:comparekit:0.1.3")
 ```toml
 # gradle/libs.versions.toml
 [versions]
-comparekit = "0.1.3"
+comparekit = "0.1.4"
 
 [libraries]
 comparekit = { module = "io.github.usmandev0:comparekit", version.ref = "comparekit" }
@@ -151,10 +153,28 @@ BeforeAfterSlider(
 )
 ```
 
+### Zoom and pan
+
+Pinch (or use the scroll wheel) to magnify both images with the same transform. While zoomed, drag the image to pan; drag near the divider to keep comparing. Double-tap resets zoom, then a second double-tap resets the slider.
+
+```kotlin
+val zoomState = rememberCompareZoomState(maxScale = 4f)
+
+BeforeAfterSlider(
+    before = before,
+    after = after,
+    zoomEnabled = true,
+    zoomState = zoomState,
+)
+```
+
+Pass `zoomEnabled = false` to keep the original drag-only behavior.
+
 ### Gestures
 
-- **Drag** — move the slider
-- **Double tap** — reset to center
+- **Drag** — move the slider (or pan when zoomed, away from the divider)
+- **Pinch / scroll wheel** — zoom both images together
+- **Double tap** — reset zoom if magnified, otherwise reset the slider to center
 - **Long press** — `onLongPress` callback
 
 ```kotlin
@@ -166,6 +186,21 @@ BeforeAfterSlider(
 )
 ```
 
+### Accessibility
+
+The slider exposes progress semantics (`progressBarRangeInfo`, `setProgress`, `stateDescription`) and keyboard support (arrows ± step, Home/End). Images stay decorative; describe them via optional params when needed.
+
+```kotlin
+BeforeAfterSlider(
+    before = before,
+    after = after,
+    contentDescription = "Photo retouch comparison",
+    beforeContentDescription = "Original photo",
+    afterContentDescription = "Edited photo",
+    progressStep = 0.05f,
+)
+```
+
 ---
 
 ## API at a glance
@@ -174,10 +209,12 @@ BeforeAfterSlider(
 | --- | --- |
 | `BeforeAfterSlider` | Main composable |
 | `SliderState` | Hoisted progress (`0f`–`1f`) |
-| `rememberCompareSliderState()` | Create state |
+| `rememberCompareSliderState()` | Create slider state |
+| `CompareZoomState` | Shared scale and pan for both images |
+| `rememberCompareZoomState()` | Create zoom state |
 | `CompareAnimationMode` | Auto-scrub modes |
 | `CompareImageSource` | Coil / Painter images |
-| `CompareKitDefaults` | Default styling values |
+| `CompareKitDefaults` | Default styling and a11y values |
 
 **Package:** `com.usmandev.comparekit.beforeafterslider`
 
@@ -191,7 +228,7 @@ cd comparekit
 ./gradlew :androidApp:installDebug
 ```
 
-The demo covers basic usage, Coil loading, customization, labels, gestures, orientation, live controls, and auto animation.
+The demo covers basic usage, Coil loading, customization, labels, gestures, orientation, live controls, auto animation, accessibility, and synced zoom/pan.
 
 ---
 
@@ -199,9 +236,10 @@ The demo covers basic usage, Coil loading, customization, labels, gestures, orie
 
 | Planned | Status |
 | --- | --- |
-| Zoom, magnifier, video comparison | Planned |
+| Pinch-zoom and pan | Done |
+| Magnifier, video comparison | Planned |
 | Desktop & Web targets | Planned |
-| Accessibility improvements | Planned |
+| Accessibility improvements | Done |
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
 

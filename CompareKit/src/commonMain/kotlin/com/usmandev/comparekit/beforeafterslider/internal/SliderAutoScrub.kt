@@ -1,14 +1,14 @@
-package com.usmandev.comparekit.beforeafterslider
+package com.usmandev.comparekit.beforeafterslider.internal
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import com.usmandev.comparekit.beforeafterslider.CompareAnimationMode
+import com.usmandev.comparekit.beforeafterslider.SliderState
+import com.usmandev.comparekit.beforeafterslider.defaults.autoScrubAnimationSpec
 
 /**
- * Drives automatic slider progress animation for [BeforeAfterSlider].
+ * Drives automatic slider progress animation.
  *
  * If multiple sliders share the same [SliderState], enable auto-scrub on only one
  * composable to avoid conflicting animation loops.
@@ -61,11 +61,4 @@ internal fun SliderAutoScrubEffect(
             }
         }
     }
-}
-
-internal fun autoScrubAnimationSpec(durationMillis: Int): AnimationSpec<Float> {
-    return tween(
-        durationMillis = durationMillis.coerceAtLeast(1),
-        easing = LinearEasing,
-    )
 }

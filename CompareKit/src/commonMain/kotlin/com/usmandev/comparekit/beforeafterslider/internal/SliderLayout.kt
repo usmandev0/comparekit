@@ -1,9 +1,10 @@
-package com.usmandev.comparekit.beforeafterslider
+package com.usmandev.comparekit.beforeafterslider.internal
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import com.usmandev.comparekit.beforeafterslider.SliderOrientation
 import kotlin.math.roundToInt
 
 internal data class SliderClipBounds(

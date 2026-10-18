@@ -8,6 +8,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.usmandev.comparekit.beforeafterslider.SliderState.Companion.MaxProgress
+import com.usmandev.comparekit.beforeafterslider.SliderState.Companion.MinProgress
+import com.usmandev.comparekit.beforeafterslider.defaults.autoScrubAnimationSpec
 
 /**
  * Holds the reveal progress of a [BeforeAfterSlider].

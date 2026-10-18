@@ -14,9 +14,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -24,6 +27,21 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import com.usmandev.comparekit.beforeafterslider.defaults.ZoomDefaults
+import kotlin.math.max
+import com.usmandev.comparekit.beforeafterslider.internal.CompareSliderLabels
+import com.usmandev.comparekit.beforeafterslider.internal.SliderAutoScrubEffect
+import com.usmandev.comparekit.beforeafterslider.internal.SliderDivider
+import com.usmandev.comparekit.beforeafterslider.internal.SliderThumb
+import com.usmandev.comparekit.beforeafterslider.internal.compareSliderKeyboard
+import com.usmandev.comparekit.beforeafterslider.internal.compareSliderSemantics
+import com.usmandev.comparekit.beforeafterslider.internal.resolveCompareSliderContentDescription
+import com.usmandev.comparekit.beforeafterslider.internal.sliderClipBounds
+import com.usmandev.comparekit.beforeafterslider.internal.sliderDividerAlignment
+import com.usmandev.comparekit.beforeafterslider.internal.sliderDividerOffset
+import com.usmandev.comparekit.beforeafterslider.internal.sliderGestures
+import com.usmandev.comparekit.beforeafterslider.internal.sliderThumbOffset
 
 /**
  * A before/after image comparison slider built with Compose Multiplatform.
@@ -74,7 +92,16 @@ import androidx.compose.ui.unit.IntSize
  * @param animationMode automatic animation mode for the slider progress.
  * @param autoScrubDurationMillis duration of one auto-scrub leg in milliseconds.
  * @param pauseAutoScrubOnInteraction when `true`, auto-scrub pauses while the user drags.
+ * @param contentDescription accessibility label for the slider as a whole.
+ * @param beforeContentDescription optional description of the before image.
+ * @param afterContentDescription optional description of the after image.
+ * @param progressStep fraction used for keyboard and accessibility progress steps.
+ * @param zoomEnabled when `true`, pinch, two-finger pan, and scroll-wheel zoom
+ * both images together. One-finger drag still moves the divider at 1x, or when
+ * the pointer starts near the divider while zoomed.
+ * @param zoomState shared zoom and pan; defaults to [rememberCompareZoomState].
  */
+@Suppress("ParamsComparedByRef")
 @Composable
 fun BeforeAfterSlider(
     before: Painter,
@@ -113,6 +140,12 @@ fun BeforeAfterSlider(
     animationMode: CompareAnimationMode = CompareKitDefaults.AutoScrubAnimationMode,
     autoScrubDurationMillis: Int = CompareKitDefaults.AutoScrubDurationMillis,
     pauseAutoScrubOnInteraction: Boolean = CompareKitDefaults.PauseAutoScrubOnInteraction,
+    contentDescription: String = CompareKitDefaults.ContentDescription,
+    beforeContentDescription: String? = null,
+    afterContentDescription: String? = null,
+    progressStep: Float = CompareKitDefaults.ProgressStep,
+    zoomEnabled: Boolean = CompareKitDefaults.ZoomEnabled,
+    zoomState: CompareZoomState = rememberCompareZoomState(),
 ) {
     BeforeAfterSlider(
         before = CompareImageSource.painter(before),
@@ -151,6 +184,12 @@ fun BeforeAfterSlider(
         animationMode = animationMode,
         autoScrubDurationMillis = autoScrubDurationMillis,
         pauseAutoScrubOnInteraction = pauseAutoScrubOnInteraction,
+        contentDescription = contentDescription,
+        beforeContentDescription = beforeContentDescription,
+        afterContentDescription = afterContentDescription,
+        progressStep = progressStep,
+        zoomEnabled = zoomEnabled,
+        zoomState = zoomState,
     )
 }
 
@@ -161,6 +200,7 @@ fun BeforeAfterSlider(
  * such as URLs, files, drawables, and bitmaps. Local [Painter] instances are supported via
  * [CompareImageSource.painter].
  */
+@Suppress("ParamsComparedByRef")
 @Composable
 fun BeforeAfterSlider(
     before: CompareImageSource,
@@ -203,6 +243,12 @@ fun BeforeAfterSlider(
     animationMode: CompareAnimationMode = CompareKitDefaults.AutoScrubAnimationMode,
     autoScrubDurationMillis: Int = CompareKitDefaults.AutoScrubDurationMillis,
     pauseAutoScrubOnInteraction: Boolean = CompareKitDefaults.PauseAutoScrubOnInteraction,
+    contentDescription: String = CompareKitDefaults.ContentDescription,
+    beforeContentDescription: String? = null,
+    afterContentDescription: String? = null,
+    progressStep: Float = CompareKitDefaults.ProgressStep,
+    zoomEnabled: Boolean = CompareKitDefaults.ZoomEnabled,
+    zoomState: CompareZoomState = rememberCompareZoomState(),
 ) {
     val beforePainter = rememberCompareImagePainter(
         source = before,
@@ -251,9 +297,16 @@ fun BeforeAfterSlider(
         animationMode = animationMode,
         autoScrubDurationMillis = autoScrubDurationMillis,
         pauseAutoScrubOnInteraction = pauseAutoScrubOnInteraction,
+        contentDescription = contentDescription,
+        beforeContentDescription = beforeContentDescription,
+        afterContentDescription = afterContentDescription,
+        progressStep = progressStep,
+        zoomEnabled = zoomEnabled,
+        zoomState = zoomState,
     )
 }
 
+@Suppress("ParamsComparedByRef")
 @Composable
 private fun BeforeAfterSliderLayout(
     before: Painter,
@@ -291,6 +344,12 @@ private fun BeforeAfterSliderLayout(
     animationMode: CompareAnimationMode,
     autoScrubDurationMillis: Int,
     pauseAutoScrubOnInteraction: Boolean,
+    contentDescription: String,
+    beforeContentDescription: String?,
+    afterContentDescription: String?,
+    progressStep: Float,
+    zoomEnabled: Boolean,
+    zoomState: CompareZoomState,
 ) {
     var layoutSize by remember { mutableStateOf(IntSize.Zero) }
     var isUserInteracting by remember { mutableStateOf(false) }
@@ -323,6 +382,25 @@ private fun BeforeAfterSliderLayout(
             thumbBorderColor.copy(alpha = thumbBorderColor.alpha * CompareKitDefaults.DisabledAlpha)
         }
     }
+    val resolvedContentDescription = remember(
+        contentDescription,
+        beforeContentDescription,
+        afterContentDescription,
+    ) {
+        resolveCompareSliderContentDescription(
+            contentDescription = contentDescription,
+            beforeContentDescription = beforeContentDescription,
+            afterContentDescription = afterContentDescription,
+        )
+    }
+    val zoomHitSlopPx = remember(density, thumbSize) {
+        with(density) {
+            max(thumbSize.toPx() / 2f + 16.dp.toPx(), ZoomDefaults.SliderHitSlop.toPx())
+        }
+    }
+    val zoomScale = if (zoomEnabled) zoomState.scale else 1f
+    val zoomOffsetX = if (zoomEnabled) zoomState.offsetX else 0f
+    val zoomOffsetY = if (zoomEnabled) zoomState.offsetY else 0f
     val currentOnDoubleTap = rememberUpdatedState(onDoubleTap)
     val currentOnLongPress = rememberUpdatedState(onLongPress)
     val handleDoubleTap = remember {
@@ -350,7 +428,23 @@ private fun BeforeAfterSliderLayout(
         modifier = modifier
             .clip(clipShape)
             .background(backgroundColor)
-            .onSizeChanged { layoutSize = it }
+            .onSizeChanged { size ->
+                layoutSize = size
+                if (zoomEnabled) {
+                    zoomState.coerceToViewport(size)
+                }
+            }
+            .compareSliderSemantics(
+                state = state,
+                contentDescription = resolvedContentDescription,
+                enabled = enabled,
+            )
+            .compareSliderKeyboard(
+                state = state,
+                orientation = orientation,
+                enabled = enabled,
+                progressStep = progressStep,
+            )
             .sliderGestures(
                 state = state,
                 sizeProvider = { layoutSize },
@@ -362,6 +456,9 @@ private fun BeforeAfterSliderLayout(
                 onLongPress = handleLongPress,
                 onInteractionStart = { isUserInteracting = true },
                 onInteractionEnd = { isUserInteracting = false },
+                zoomEnabled = zoomEnabled,
+                zoomState = zoomState,
+                zoomHitSlopPx = zoomHitSlopPx,
             ),
     ) {
         CompareImageViewer(
@@ -370,17 +467,14 @@ private fun BeforeAfterSliderLayout(
             contentScale = contentScale,
             modifier = Modifier
                 .fillMaxSize()
-                .drawWithContent {
-                    val clipBounds = sliderClipBounds(size, state.progress, orientation)
-                    clipRect(
-                        left = clipBounds.beforeLeft,
-                        top = clipBounds.beforeTop,
-                        right = clipBounds.beforeRight,
-                        bottom = clipBounds.beforeBottom,
-                    ) {
-                        this@drawWithContent.drawContent()
-                    }
-                },
+                .compareImageWindow(
+                    progress = state.progress,
+                    orientation = orientation,
+                    isBefore = true,
+                    scale = zoomScale,
+                    offsetX = zoomOffsetX,
+                    offsetY = zoomOffsetY,
+                ),
         )
 
         CompareImageViewer(
@@ -389,17 +483,14 @@ private fun BeforeAfterSliderLayout(
             contentScale = contentScale,
             modifier = Modifier
                 .fillMaxSize()
-                .drawWithContent {
-                    val clipBounds = sliderClipBounds(size, state.progress, orientation)
-                    clipRect(
-                        left = clipBounds.afterLeft,
-                        top = clipBounds.afterTop,
-                        right = clipBounds.afterRight,
-                        bottom = clipBounds.afterBottom,
-                    ) {
-                        this@drawWithContent.drawContent()
-                    }
-                },
+                .compareImageWindow(
+                    progress = state.progress,
+                    orientation = orientation,
+                    isBefore = false,
+                    scale = zoomScale,
+                    offsetX = zoomOffsetX,
+                    offsetY = zoomOffsetY,
+                ),
         )
 
         if (showDivider) {
@@ -465,5 +556,32 @@ private fun BeforeAfterSliderLayout(
                 }
             },
         )
+    }
+}
+
+/**
+ * Clips to the before or after half in viewport space, then draws the image
+ * with a top-start zoom/pan transform so the divider stays on screen.
+ */
+private fun Modifier.compareImageWindow(
+    progress: Float,
+    orientation: SliderOrientation,
+    isBefore: Boolean,
+    scale: Float,
+    offsetX: Float,
+    offsetY: Float,
+): Modifier = drawWithContent {
+    val clipBounds = sliderClipBounds(size, progress, orientation)
+    clipRect(
+        left = if (isBefore) clipBounds.beforeLeft else clipBounds.afterLeft,
+        top = if (isBefore) clipBounds.beforeTop else clipBounds.afterTop,
+        right = if (isBefore) clipBounds.beforeRight else clipBounds.afterRight,
+        bottom = if (isBefore) clipBounds.beforeBottom else clipBounds.afterBottom,
+    ) {
+        translate(left = offsetX, top = offsetY) {
+            scale(scaleX = scale, scaleY = scale, pivot = Offset.Zero) {
+                this@drawWithContent.drawContent()
+            }
+        }
     }
 }

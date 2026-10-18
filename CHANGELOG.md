@@ -9,6 +9,21 @@ All notable changes to CompareKit are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [0.1.4] - 2026-10-18
+
+### Added
+
+- **Synced zoom and pan** — pinch, two-finger pan, and scroll-wheel zoom both images together via `CompareZoomState` / `rememberCompareZoomState()`. The divider still clips in viewport space so alignment is preserved. One-finger drag moves the slider at 1x, or when the gesture starts near the divider while zoomed; otherwise it pans. Double-tap resets zoom first, then slider position.
+- **Zoom defaults** — `zoomEnabled` (on by default), `CompareKitDefaults.MinZoomScale`, and `CompareKitDefaults.MaxZoomScale`.
+- **Accessibility** — `contentDescription`, `beforeContentDescription`, `afterContentDescription`, and `progressStep` on `BeforeAfterSlider`, with progress semantics (range, `setProgress`, `stateDescription`) and keyboard navigation (arrows, Home, End).
+- **Accessibility defaults** — `CompareKitDefaults.ContentDescription` and `CompareKitDefaults.ProgressStep`.
+
+### Changed
+
+- Reorganized library internals into `defaults/` and `internal/` packages. Public imports stay the same via root typealiases for `CompareKitDefaults` and `CompareLabelDefaults`.
+
 ## [0.1.3] - 2026-08-03
 
 ### Added
@@ -77,6 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed before/after image background bleed at clip boundaries.
 
+[0.1.4]: https://github.com/usmandev0/comparekit/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/usmandev0/comparekit/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/usmandev0/comparekit/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/usmandev0/comparekit/compare/v0.1.0...v0.1.1
