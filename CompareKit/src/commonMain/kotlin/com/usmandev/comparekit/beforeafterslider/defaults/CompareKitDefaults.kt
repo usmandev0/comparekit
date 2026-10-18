@@ -60,4 +60,13 @@ object CompareKitDefaults {
 
     /** Default progress step for keyboard and accessibility adjust actions. */
     const val ProgressStep: Float = AccessibilityDefaults.ProgressStep
+
+    /** When `true`, pinch, pan, and scroll-wheel zoom are enabled. */
+    const val ZoomEnabled: Boolean = ZoomDefaults.Enabled
+
+    /** Minimum zoom scale (`1` is layout size). */
+    const val MinZoomScale: Float = ZoomDefaults.MinScale
+
+    /** Maximum zoom scale. */
+    const val MaxZoomScale: Float = ZoomDefaults.MaxScale
 }

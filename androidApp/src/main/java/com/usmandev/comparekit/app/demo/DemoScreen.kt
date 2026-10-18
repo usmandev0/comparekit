@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +30,8 @@ import com.usmandev.comparekit.beforeafterslider.CompareLabel
 import com.usmandev.comparekit.beforeafterslider.CompareLabelAlignment
 import com.usmandev.comparekit.beforeafterslider.SliderOrientation
 import com.usmandev.comparekit.beforeafterslider.rememberCompareSliderState
+import com.usmandev.comparekit.beforeafterslider.rememberCompareZoomState
+import kotlin.math.roundToInt
 
 /**
  * Interactive showcase screen that demonstrates every public CompareKit feature.
@@ -248,6 +251,40 @@ fun DemoScreen(
             )
         }
 
+        DemoSection(
+            title = "10. Zoom & Pan",
+            description = "Pinch both images together, pan the magnified view, and keep dragging the divider to compare.",
+        ) {
+            val zoomSliderState = rememberCompareSliderState()
+            val zoomState = rememberCompareZoomState()
+            BeforeAfterSlider(
+                before = beforePainter,
+                after = afterPainter,
+                state = zoomSliderState,
+                zoomState = zoomState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(DemoSliderHeight),
+                cornerRadius = 12.dp,
+            )
+            Text(
+                text = "Zoom ${(zoomState.scale * 10f).roundToInt() / 10f}×",
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = "Pinch or scroll-wheel to zoom • Drag the image to pan when zoomed • " +
+                    "Drag the divider to compare • Double-tap resets zoom, then the slider",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            OutlinedButton(
+                onClick = zoomState::reset,
+                enabled = zoomState.isZoomed,
+            ) {
+                Text("Reset zoom")
+            }
+        }
+
         DemoGlobalActions(demoState = demoState)
     }
 }
@@ -271,15 +308,16 @@ private fun DemoWhatsNewCard(
             style = MaterialTheme.typography.titleSmall,
         )
         Text(
-            text = "• Accessibility: content descriptions, progress semantics, keyboard steps\n" +
-                "• Defaults reorganized under defaults/; internals under internal/\n" +
-                "• Public imports unchanged via typealiases",
+            text = "• Synced pinch-zoom and pan: both images stay aligned while you compare\n" +
+                "• Accessibility: content descriptions, progress semantics, keyboard steps\n" +
+                "• Defaults reorganized under defaults/; internals under internal/",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
 
+@Suppress("ParamsComparedByRef")
 @Composable
 private fun LabelExamplesRow(
     beforePainter: Painter,
@@ -326,6 +364,7 @@ private fun LabelExamplesRow(
     }
 }
 
+@Suppress("ParamsComparedByRef")
 @Composable
 private fun OrientationExamples(
     beforePainter: Painter,
